@@ -46,7 +46,7 @@ def main():
     # Random planner
     scores_rw, bcs_rw ,score_2_rw =[], [], []
     for name in fnames:
-        score, bc, score_2 = RandomPlanner(name, 20, explainer, smote=True, small=.03, act=False)
+        score, bc, score_2 = RandomPlanner(name, 20, explainer, smote=True, act=False)
         scores_rw.append(score)
         bcs_rw.append(bc)
         score_2_rw.append(score_2)
