@@ -7,8 +7,10 @@ import lime.lime_tabular
 from imblearn.over_sampling import SMOTE
 from scipy import stats
 import collections
+## This file contains all tools needed to run planners.
 
 def prepareData(fname):
+    # Read csv file into dataframe
     # print(os.path.join())
     file = os.path.join("Data",fname)
     df = pd.read_csv(file,sep=',')
@@ -21,12 +23,13 @@ def prepareData(fname):
 
 
 def bugs(fname):
+    # return the number of bugs in each row
     file = os.path.join("Data", fname)
     df = pd.read_csv(file,sep=',')
     return df.iloc[:,-1]
 
 def translate1(sentence, name):
-    # do not aim to change the column
+    # translate LIME explanations in to 2 values, representing the interval
     lst = sentence.strip().split(name)
     left, right = 0, 0
     if lst[0] == '':
@@ -65,6 +68,7 @@ def translate1(sentence, name):
 
 
 def translate(sentence, name):
+    # not used
     flag = 0
     threshold = 0
     lst = sentence.strip().split(name)
@@ -119,11 +123,12 @@ def translate(sentence, name):
 
 
 def flip(data_row, local_exp, ind, clf, cols, n_feature=3, actionable=None):
+    # if actionable is none, make changes on all possible columns
+    # if passed in an actionable list, make changes on those columns
     counter = 0
     rejected = 0
     cache = []
     trans = []
-    # print("B4:", np.round(clf.predict_proba([data_row])[0][0], 3))
     # Store feature index in cache.
     cnt = []
     for i in range(0, len(local_exp)):
@@ -172,12 +177,14 @@ def flip(data_row, local_exp, ind, clf, cols, n_feature=3, actionable=None):
                 rejected += 1
             l, r = translate1(trans[j][0], cols[cache[j][0]])
             result[cache[j][0]][0], result[cache[j][0]][1] = l, r
-    # print("Now:", np.round(clf.predict_proba([tem])[0][0], 3))
+    # tem is the exact recommended values for each column
+    # result is the plan in terms of intervals
+    # rejected counts the number of changes rejected by TimeLIME
     return tem, result, rejected
 
 
 def hedge(arr1,arr2):
-    # return true is delta is smaller than small, which means no difference
+    # returns a value, larger means more changes
     s1,s2 = np.std(arr1),np.std(arr2)
     m1,m2 = np.mean(arr1),np.mean(arr2)
     n1,n2 = len(arr1),len(arr2)
@@ -210,6 +217,7 @@ def overlap(ori,plan,actual): # Jaccard similarity function
 
 
 def RandomWalk(data_row,local_exp,ind,clf,cols,n_feature = 3,actionable = None):
+    # used in random planner
     cache = []
     trans = []
     for i in range(0,len(local_exp)):
